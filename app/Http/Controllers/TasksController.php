@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-use App\Task;
+use App\Tasks;
 
 class TasksController extends Controller
 {
@@ -26,7 +26,7 @@ class TasksController extends Controller
             ];
         }    
         
-        return view('welcom',$data);
+        return view('welcome',$data);
     }
 
     /**
@@ -55,17 +55,20 @@ class TasksController extends Controller
         $this->validate($request, [
             'status' => 'required|max:10',   
             'content' => 'required|max:191',
+            'user_id' => 'required|max:191',
         ]);
         
         $request->user()->tasks()->create([
             'content' => $request->content,
+            'user_id' => $request->user_id,
         ]);
 
         return back();
         
         $task = new Task;
         $task -> status = $request->status;
-        $task->content = $request->content;
+        $task -> content = $request->content;
+        $task -> user_id = $request->user_id;
         $task->save();
 
         return redirect('/');
@@ -80,7 +83,7 @@ class TasksController extends Controller
      */
     public function show($id)
     {
-        $task = Task::find($id);
+        $task = Tasks::find($id);
 
         return view('tasks.show', [
             'task' => $task,
@@ -114,11 +117,13 @@ class TasksController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request, [
+            'user_id' => 'required|max:191',
             'status' => 'required|max:10',   
             'content' => 'required|max:191',
         ]);
         
         $task = Task::find($id);
+        $task->user_id = $request->user_id;
         $task->status = $request->status;
         $task->content = $request->content;
         $task->save();
